@@ -1,15 +1,39 @@
-Install dependencies:
-	- Python (pip): PySpark, re, finnhub, pandas, time
- 	- Kafka_2.13-4.0.0
-	- spark-3.4.4-bin-hadoop3-scala2.13
-	- ELK Stack 
+# Real-Time Named Entity Tracker with Kafka, Spark, and ELK
+---
 
+## Dependencies
 
-How to Run:
-	1. Run Kibana (localhost port 5601 default) and ElasticSearch (port 9200)
-	2. Open a Terminal Window-> cd into Kafka folder -> run: bin/kafka-server-start.sh config/server.properties  (after its already been set up once)
- 	3. Open another Terminal Window -> cd into Project folder -> run logstash file: logstash -f logstash.conf
-	4. Open another Terminal Window -> cd into Project folder -> run consumer: spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:3.4.4 headline_consumer.py
-	5. Open another Terminal Window -> cd into Project folder -> run producer: spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:3.4.4 headline_producer.py
- 	6. Open Kibana, login, create index: test2, and then create the dashboard as necessary to see the plots
-	
+Install the following before running the project:
+
+### Python (via pip)
+- `pyspark`
+- `finnhub-python`
+- `pandas`
+- `re`, `time` (standard library)
+
+### Platforms & Tools
+- **Kafka:** `kafka_2.13-4.0.0`
+- **Apache Spark:** `spark-3.4.4-bin-hadoop3-scala2.13`
+- **ELK Stack:** Elasticsearch + Logstash + Kibana (tested with 8.x+)
+
+---
+
+## How to Run
+
+### 1. Start the ELK Stack
+- Run **Elasticsearch** (default: `localhost:9200`)
+- Run **Kibana** (default: `localhost:5601`)
+
+### 2. Start Kafka
+Open a terminal and navigate to your Kafka directory:
+```bash
+cd path/to/kafka/
+bin/kafka-server-start.sh config/server.properties
+```
+### 3. Start Consumer and Producer Respectively
+Open a terminal and navigate to your Kafka directory:
+```bash
+cd path/to/project/folder
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:3.4.4 headline_[consumer/producer].py
+```
+
