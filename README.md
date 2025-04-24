@@ -30,8 +30,16 @@ Open a terminal and navigate to your Kafka directory:
 cd path/to/kafka/
 bin/kafka-server-start.sh config/server.properties
 ```
+### 3. Run Logstash
+- First, open logstash.conf and update password to your assigned Kibana password
+- Open a terminal and navigate to your Project directory:
+```bash
+cd path/to/project/folder
+logstash -f logstash.conf
+```
+
 ### 3. Start Consumer and Producer Respectively
-Open a terminal and navigate to your Kafka directory:
+Open a terminal and navigate to your Project directory:
 ```bash
 cd path/to/project/folder
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:3.4.4 headline_[consumer/producer].py
