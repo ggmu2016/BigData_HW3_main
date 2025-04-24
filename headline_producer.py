@@ -1,7 +1,6 @@
 import time
 
 import finnhub
-import sys
 from pyspark.sql import SparkSession
 import pandas as pd
 
@@ -22,7 +21,7 @@ if __name__ == "__main__":
     last_seen_id = 0
     while True:
         # General market news
-        news_arr = finnhub_client.general_news('general', min_id=last_seen_id)
+        news_arr = finnhub_client.general_news('crypto', min_id=last_seen_id)
         if not news_arr:
             print("No new headlines")
             time.sleep(60)

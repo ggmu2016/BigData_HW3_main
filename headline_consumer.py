@@ -5,76 +5,60 @@ You should already know how to extract named entities from text.
 In this part, you will keep a running count of the named entities being mentioned.
 """
 import sys
+import spacy
+import re
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode,udf,split, desc, asc, to_json, struct
 from pyspark.sql.types import ArrayType, StringType
 
-import nltk
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('maxent_ne_chunker')
-nltk.download('words')
-from nltk import word_tokenize, pos_tag, ne_chunk
-from nltk.tree import Tree
+'''
+#############################
+SPACY CAUSING CONSUMER TO CRASH
+##############################
 
-
-# load spacy english words (medium sized)
-#nlp = spacy.load("en_core_web_sm")
-
-# spark user-defined function (UDF) to convert text into NER
-"""
-#SPACY option
+# load spacy english words (small sized)
+nlp = spacy.load("en_core_web_sm")
 
 def get_named_entities(text):
     try:
         if text is None or text.strip() == "":
             return []
-        import spacy
-        nlp = spacy.load("en_core_web_sm")
         doc = nlp(text)
         return [ent.text for ent in doc.ents]
     except Exception as e:
         return []
-"""
-""" 
-#NLTK OPTION
-
+'''
+# Using Rule-based NER because both Spacy and NLTK fail
 def get_named_entities(text):
     try:
-        if text is None or text.strip() == "":
+        if not text or text.strip() == "":
             return []
 
-        chunks = ne_chunk(pos_tag(word_tokenize(text)))
-        entities = []
+        # Tokenize + punctuation removal
+        tokens = re.findall(r'\b[A-Z][a-z]{2,}\b', text)
 
-        for chunk in chunks:
-            if isinstance(chunk, Tree):
-                entity = " ".join(c[0] for c in chunk)
-                entities.append(entity)
+        # Combine sequences of capitalized words
+        full_entities = []
+        current = []
 
-        return entities
-    except:
+        for word in text.split():
+            if word.istitle() and len(word) >= 3:
+                current.append(word)
+            else:
+                if current:
+                    full_entities.append(" ".join(current))
+                    current = []
+        if current:
+            full_entities.append(" ".join(current))
+
+        # Filter out travial stopwords
+        stop_sim = {"The", "This", "That", "And", "But", "With", "For", "From", "Into", "Analysts", "It", "A",
+                    "They"}
+        return [ent for ent in full_entities if ent not in stop_sim and len(ent) > 4]
+
+    except Exception as e:
         return []
-"""
 
-
-# simulating non NLP
-
-def get_named_entities(text):
-    try:
-        if text is None or text.strip() == "":
-            return []
-
-        # Simulate NER: extract capitalized words only (like Apple, Tesla)
-        tokens = text.strip().split()
-        entities = [word for word in tokens if word.istitle() and word.isalpha()]
-
-        # Optional: remove noise like "The", "In", etc.
-        stopwords = {"The", "A", "An", "In", "On", "Of", "For", "At", "To", "From"}
-        return [e for e in entities if e not in stopwords]
-
-    except Exception:
-        return []
 
 
 ner_udf = udf(get_named_entities, ArrayType(StringType()))
@@ -111,7 +95,7 @@ if __name__ == "__main__":
              .outputMode("complete")
              .option("kafka.bootstrap.servers", "localhost:9092")
              .option("topic","ner_counts")
-             .option("checkpointLocation", "BigData_HW3/tmp/ner_kafka_checkpoint")
+             .option("checkpointLocation", "tmp/ner_kafka_checkpoint")
              .trigger(processingTime='60 seconds')
              .start())
 
