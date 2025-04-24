@@ -36,4 +36,7 @@ Open a terminal and navigate to your Kafka directory:
 cd path/to/project/folder
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:3.4.4 headline_[consumer/producer].py
 ```
+### 4. Login to Kibana
+Current ElasticSearch index in Logstash is set up as test2
+- Add that to index in Kibana and use the discover/dashboard feature to plot count vs entities plot
 
