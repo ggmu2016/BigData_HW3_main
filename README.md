@@ -38,13 +38,13 @@ cd path/to/project/folder
 logstash -f logstash.conf
 ```
 
-### 3. Start Consumer and Producer Respectively
+### 4. Start Consumer and Producer Respectively
 Open a terminal and navigate to your Project directory:
 ```bash
 cd path/to/project/folder
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:3.4.4 headline_[consumer/producer].py
 ```
-### 4. Login to Kibana
+### 5. Login to Kibana
 Current ElasticSearch index in Logstash is set up as test2
 - Add that to index in Kibana and use the discover/dashboard feature to plot count vs entities plot
 
