@@ -23,10 +23,31 @@ def get_named_entities(text):
     try:
         if text is None or text.strip() == "":
             return []
-        doc = nlp(text)
+        doc = get_spacy_pipeline(text)
         return [ent.text for ent in doc.ents]
     except Exception as e:
         return []
+'''
+
+
+nlp = None
+
+def get_spacy_pipeline(lang="en_core_web_sm"):
+    global nlp
+    if nlp is None:
+        nlp = spacy.load(lang)
+    return nlp
+
+def get_named_entities(text):
+    try:
+        if text is None or text.strip() == "":
+            return []
+        pipeline = get_spacy_pipeline()
+        doc = pipeline(text)
+        return [ent.text for ent in doc.ents]
+    except Exception as e:
+        return []
+
 '''
 # Using Rule-based NER because both Spacy and NLTK fail
 def get_named_entities(text):
@@ -59,7 +80,7 @@ def get_named_entities(text):
     except Exception as e:
         return []
 
-
+'''
 
 ner_udf = udf(get_named_entities, ArrayType(StringType()))
 
