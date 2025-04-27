@@ -6,7 +6,11 @@ import pandas as pd
 
 
 # setup client (obtain API key for free from Finnhub.io)
-finnhub_client = finnhub.Client(api_key="d01dbfhr01qile5uvjugd01dbfhr01qile5uvjv0")
+api_key = "ADD YOUR API KEY HERE"
+finnhub_client = finnhub.Client(api_key=api_key)
+
+# Enter sleep time
+sleep_time = 30 #s
 
 
 if __name__ == "__main__":
@@ -16,15 +20,13 @@ if __name__ == "__main__":
         .appName("FinnhubWordCount")\
         .getOrCreate()
 
-    spark.sparkContext.setLogLevel("ERROR")
-
     last_seen_id = 0
     while True:
         # General market news
         news_arr = finnhub_client.general_news('general', min_id=last_seen_id)
         if not news_arr:
             print("No new headlines")
-            time.sleep(60)
+            time.sleep(sleep_time)
             continue
 
         headlines = []
@@ -32,7 +34,7 @@ if __name__ == "__main__":
             headline = news['headline']
             news_id = news['id']
             headlines.append((headline,))
-            last_seen_id = max(last_seen_id, news_id)
+            last_seen_id = max(last_seen_id, news_id) # this make sure only NEW headlines are pushed
 
         #converting to df to use in spark
         df = pd.DataFrame(headlines, columns=['value'])
@@ -44,4 +46,4 @@ if __name__ == "__main__":
               option("topic","finnhub_headlines").save())
 
         print(f"Pushed {len(headlines)} headlines to Kafka. Latest ID: {last_seen_id}")
-        time.sleep(60)
+        time.sleep(sleep_time)
